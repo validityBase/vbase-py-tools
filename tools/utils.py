@@ -4,22 +4,17 @@ Common validityBase (vBase) tools code
 
 import logging
 import sys
-from typing import Any
+from typing import Any, Dict, Optional, List
 import boto3
 
-from tools import (
-    get_default_logger,
-    C2,
-    Web3HTTPCommitmentService,
-    Web3HTTPCommitmentTestService,
-)
+from vbase import get_default_logger
 
 
 _LOG = get_default_logger(__name__)
 _LOG.setLevel(logging.INFO)
 
 
-def check_env_var(env_vars_dict: dict[str, str | None], env_var_name: str):
+def check_env_var(env_vars_dict: Dict[str, Optional[str]], env_var_name: str):
     """
     Checks that an environment variable is defined.
 
@@ -32,7 +27,7 @@ def check_env_var(env_vars_dict: dict[str, str | None], env_var_name: str):
 
 
 def get_s3_handle(
-    use_aws_access_key: bool = False, env_vars: dict[str, str | None] = None
+    use_aws_access_key: bool = False, env_vars: Dict[str, Optional[str]] = None
 ) -> Any:
     """
     Constructs and returns an S3 handle for given settings.
@@ -57,35 +52,9 @@ def get_s3_handle(
     return boto3.client("s3")
 
 
-def get_c2_handle(test: bool = False, env_vars: dict[str, str | None] = None) -> C2:
-    """
-    Constructs and returns a vBase handle for given settings.
-
-    :param test: True is the test commitment service should be used;
-        False otherwise.
-    :param env_vars: The environment variable dictionary.
-    """
-    check_env_var(env_vars, "ENDPOINT_URL")
-    check_env_var(env_vars, "C2C_ADDRESS")
-    if test:
-        c2_class = Web3HTTPCommitmentTestService
-    else:
-        c2_class = Web3HTTPCommitmentService
-    return C2(
-        c2_class(
-            endpoint_url=env_vars["ENDPOINT_URL"],
-            c2c_address=env_vars["C2C_ADDRESS"],
-            private_key=env_vars["PRIVATE_KEY"] if "PRIVATE_KEY" in env_vars else None,
-            inject_geth_poa_middleware=bool(env_vars["INJECT_GETH_POA_MIDDLEWARE"])
-            if "INJECT_GETH_POA_MIDDLEWARE" in env_vars
-            else False,
-        )
-    )
-
-
 def get_all_matching_objects(
     s3: Any, bucket: str, key_prefix: str = None
-) -> list[dict]:
+) -> List[dict]:
     """
     Worker function that retrieves all objects from a bucket,
     possibly using a key prefix.
@@ -114,7 +83,7 @@ def read_s3_object(
     s3: Any,
     bucket: str,
     key: str,
-    version_id: str | None = None,
+    version_id: Optional[str] = None,
 ) -> str:
     """
     Worker function returning a single S3 object.
@@ -138,6 +107,7 @@ def read_s3_object(
             response = s3.get_object(Bucket=bucket, Key=key)
         file_content = response["Body"].read().decode("utf-8")
         _LOG.debug("Characters read: %d", len(file_content))
+    # pylint: disable=broad-except
     except Exception as e:
         _LOG.error("Error reading the object: %s", str(e))
 

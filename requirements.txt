@@ -1,5 +1,5 @@
 boto3
-c2==0.0.1
 pandas
 python-dotenv
 setuptools
+git+https://github.com/validityBase/vbase-py.git#egg=vbase

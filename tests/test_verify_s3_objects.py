@@ -12,11 +12,11 @@ import secrets
 from dotenv import dotenv_values
 import pandas as pd
 
-from tools import (
+from vbase import (
     get_default_logger,
-    C2,
-    Web3HTTPCommitmentTestService,
-    C2StringSeries,
+    VBaseClientTest,
+    VBaseDataset,
+    VBaseStringObject,
 )
 
 from tools.utils import (
@@ -47,11 +47,7 @@ class TestVerifyS3Objects(unittest.TestCase):
         Set up the tests.
         """
         # The verification tests require a test C2C contract to create test commitments.
-        self.c2 = C2(
-            Web3HTTPCommitmentTestService(
-                **Web3HTTPCommitmentTestService.get_dotenv_init_args()
-            )
-        )
+        self.vbc = VBaseClientTest.create_instance_from_env(".env")
         self.env_vars = dotenv_values(".env")
         self.s3 = get_s3_handle(True, self.env_vars)
 
@@ -66,14 +62,14 @@ class TestVerifyS3Objects(unittest.TestCase):
         dataset_name = "test_" + secrets.token_hex(32)
 
         # Create the dataset and the test dataset objects.
-        ds = C2StringSeries(self.c2, dataset_name)
+        ds = VBaseDataset(self.vbc, dataset_name, VBaseStringObject)
         objs = get_all_matching_objects(
             s3=self.s3, bucket=_BUCKET_NAME, key_prefix=_KEY_PREFIX
         )
         for obj in objs:
             data = read_s3_object(self.s3, _BUCKET_NAME, obj["Key"])
             t = pd.Timestamp(obj["LastModified"])
-            ds.add_record_with_timestamp(record=data, timestamp=t)
+            ds.add_record_with_timestamp(record_data=data, timestamp=t)
 
         # Set up the test validate call for the above objects.
         parser = build_argument_parser()
@@ -95,14 +91,14 @@ class TestVerifyS3Objects(unittest.TestCase):
         using default bucket settings and a missing commitment.
         """
         dataset_name = "test_" + secrets.token_hex(32)
-        ds = C2StringSeries(self.c2, dataset_name)
+        ds = VBaseDataset(self.vbc, dataset_name, VBaseStringObject)
         objs = get_all_matching_objects(
             s3=self.s3, bucket=_BUCKET_NAME, key_prefix=_KEY_PREFIX
         )
         for obj in objs[:-1]:
             data = read_s3_object(self.s3, _BUCKET_NAME, obj["Key"])
             t = pd.Timestamp(obj["LastModified"])
-            ds.add_record_with_timestamp(record=data, timestamp=t)
+            ds.add_record_with_timestamp(record_data=data, timestamp=t)
         parser = build_argument_parser()
         args = parser.parse_args(
             [

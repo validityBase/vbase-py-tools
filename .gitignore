@@ -1,3 +1,10 @@
+# Py ignored files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
 # Build folder
 *.egg-info/
 
@@ -29,10 +36,7 @@ __pycache__
 *.DS_Store
 
 # Config
-tests/.env
-
-# venv
-venv/
+.env*
 
 # Sphinx
 docs/_*

@@ -1,5 +1,5 @@
 """
-Configures c2tools' .env settings.
+Configures vbase's .env settings.
 Asks user a series of questions to prepare the .env configuration file.
 """
 
@@ -61,12 +61,16 @@ def main():
         sys.exit(1)
 
     # Read the content of the .env file.
-    with open(file_path) as file:
+    with open(file_path, encoding="utf-8") as file:
         lines = file.readlines()
 
     if ask_yes_no_question("\nDo you want to generate a new private key?", "yes"):
         private_key = "0x" + secrets.token_hex(32)
-        account = Account.from_key(private_key)
+        # The following line creates overactive warning
+        # because of difficulties with a decorated declaration:
+        # No value for argument 'private_key' in unbound method call (no-value-for-parameter)
+        # pylint: disable=E1120
+        account = Account.from_key(private_key=private_key)
         # Update .env with the new private key and account.
         print(f"\nGenerated key for a new account: {account.address}")
         print("Please share this account with PIT Labs.")
@@ -92,7 +96,7 @@ def main():
                 lines[i] = f'AWS_SECRET_ACCESS_KEY = "{aws_secret_access_key}"\n'
 
     # Write the updated content back to the .env file.
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="utf-8") as file:
         file.writelines(lines)
 
     print("\nThe .env file has been updated.")

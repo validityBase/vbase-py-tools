@@ -7,17 +7,17 @@ import fnmatch
 import json
 import logging
 import pprint
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from dotenv import dotenv_values
 
-from tools import (
+from vbase import (
     get_default_logger,
-    C2,
-    C2StringSeries,
+    VBaseClient,
+    VBaseDataset,
+    VBaseStringObject,
 )
 
 from tools.utils import (
-    get_c2_handle,
     get_s3_handle,
     get_all_matching_objects,
     read_s3_object,
@@ -132,44 +132,41 @@ examples:
 
 
 def commit_s3_object_list(
-    c2: C2, dataset_name: str, s3: Any, bucket: str, objs: list[dict]
-) -> list[dict]:
+    vbc: VBaseClient, dataset_name: str, s3: Any, bucket: str, objs: List[dict]
+) -> List[dict]:
     """
     Worker function processing the args to execute the task.
     Factoring out the worker allows easier unit tests with test args.
 
-    :param c2: The vBase object.
+    :param vbc: The vBaseClient object.
     :param dataset_name: Name of the vBase set to receive the object hashes.
     :param s3: The AWS S3 boto client object.
     :param bucket: The S3 bucket containing the object.
     :param objs: The S3 objects to commit.
     :returns: The list of commitment receipt dictionaries.
     """
-    set_hash = C2StringSeries.get_set_hash_for_dataset(dataset_name)
-
     # Commit objects batches.
     commitment_receipts = []
     for i in range(0, len(objs), _COMMIT_OBJECT_BATCH_SIZE):
         batch = objs[i : i + _COMMIT_OBJECT_BATCH_SIZE]
         # Build object hashes.
-        object_hashes = []
+        object_cids = []
         for obj in batch:
             # Get object hash for the object contents.
             key = obj["Key"]
             print(f"Committing object: {key}")
             file_content = read_s3_object(s3, bucket, key)
-            object_hash = C2StringSeries.get_object_hash_for_dataset_record(
-                dataset_name, file_content
-            )
-            object_hashes.append(object_hash)
+            object_cid = VBaseStringObject.get_cid_for_data(file_content)
+            object_cids.append(object_cid)
 
         # Commit all hashes for the batch.
         commitment_receipt = {}
         try:
-            commitment_receipt = c2.add_set_objects_batch(
-                set_hash=set_hash,
-                object_hashes=object_hashes,
+            commitment_receipt = vbc.add_set_objects_batch(
+                set_cid=VBaseDataset.get_set_cid_for_dataset(dataset_name),
+                object_cids=object_cids,
             )
+        # pylint: disable=broad-except
         except Exception as e:
             _LOG.error("Error posting commitment: %s", str(e))
         commitment_receipts += commitment_receipt
@@ -179,7 +176,7 @@ def commit_s3_object_list(
 def commit_s3_objects(
     args: argparse.Namespace,
     env_vars: Dict[str, Optional[str]],
-) -> list[dict]:
+) -> List[dict]:
     """
     Worker function processing the args to execute the task.
     Factoring out the worker allows easier unit tests with test args.
@@ -221,18 +218,22 @@ def commit_s3_objects(
     # Static configuration such as S3 credentials and vBase access parameters
     # are stored in the .env file.
     s3 = get_s3_handle(args.use_aws_access_key, env_vars)
-    c2 = get_c2_handle(args.test, env_vars)
+    vbc = VBaseClient.create_instance_from_env(".env")
 
-    set_hash = C2StringSeries.get_set_hash_for_dataset(args.dataset_name)
+    set_cid = VBaseDataset.get_set_cid_for_dataset(args.dataset_name)
 
     # Commit the dataset (set), if necessary.
-    user_address = c2.get_default_user()
+    user_address = vbc.get_default_user()
     assert user_address is not None
-    if not c2.user_set_exists(user_address, set_hash):
-        cl = c2.add_set(set_hash)
+    if not vbc.user_set_exists(user_address, set_cid):
+        print(
+            f"Dataset commitment does not exist: user = {user_address}, "
+            f"dataset_name = {args.dataset_name}, set_cid = {set_cid}"
+        )
+        cl = vbc.add_set(set_cid)
         assert cl == {
             "user": user_address,
-            "setHash": set_hash,
+            "setCid": set_cid,
         }
 
     commitment_receipts = []
@@ -243,9 +244,7 @@ def commit_s3_objects(
 
         # Get object hash for the contents.
         file_content = read_s3_object(s3, args.bucket, args.key, args.version_id)
-        object_hash = C2StringSeries.get_object_hash_for_dataset_record(
-            args.dataset_name, file_content
-        )
+        object_cid = VBaseStringObject.get_cid_for_data(file_content)
 
         # Post the object commitment.
         # Since we are merely adding a record to a dataset,
@@ -253,10 +252,11 @@ def commit_s3_objects(
         # that receives the new record commitment.
         commitment_receipt = {}
         try:
-            commitment_receipt = c2.add_set_object(
-                set_hash=set_hash,
-                object_hash=object_hash,
+            commitment_receipt = vbc.add_set_object(
+                set_cid=set_cid,
+                object_cid=object_cid,
             )
+        # pylint: disable=broad-except
         except Exception as e:
             _LOG.error("Error posting commitment: %s", str(e))
         commitment_receipts.append(commitment_receipt)
@@ -284,7 +284,11 @@ def commit_s3_objects(
         _LOG.debug("s3.list_objects_v2(): objects = %s", pprint.pformat(objs))
 
         commitment_receipts = commit_s3_object_list(
-            c2=c2, dataset_name=args.dataset_name, s3=s3, bucket=args.bucket, objs=objs
+            vbc=vbc,
+            dataset_name=args.dataset_name,
+            s3=s3,
+            bucket=args.bucket,
+            objs=objs,
         )
     else:
         # Invalid object batch settings.
@@ -293,7 +297,7 @@ def commit_s3_objects(
     dataset_info = {
         "owner": commitment_receipts[0]["user"],
         "name": args.dataset_name,
-        "hash": set_hash,
+        "hash": set_cid,
     }
     print("Successfully posted commitment.")
     print(f"Dataset: {json.dumps(dataset_info)}")

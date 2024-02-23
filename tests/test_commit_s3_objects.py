@@ -10,10 +10,9 @@ import pprint
 import unittest
 from dotenv import dotenv_values
 
-from tools import (
+from vbase import (
     get_default_logger,
-    C2,
-    Web3HTTPCommitmentService,
+    VBaseClient,
 )
 
 from tools.commit_s3_objects import (
@@ -35,11 +34,7 @@ class TestCommitS3Objects(unittest.TestCase):
         """
         Set up the tests.
         """
-        self.c2 = C2(
-            Web3HTTPCommitmentService(
-                **Web3HTTPCommitmentService.get_dotenv_init_args()
-            )
-        )
+        self.vbc = VBaseClient.create_instance_from_env(".env")
         self.env_vars = dotenv_values(".env")
 
     def test_commit_test_1(self):
@@ -58,9 +53,9 @@ class TestCommitS3Objects(unittest.TestCase):
         )
         _LOG.info(f"Testing args:\n{pprint.pformat(vars(args))}")
         commitment_receipt = commit_s3_objects(args, self.env_vars)[0]
-        assert self.c2.verify_user_object(
+        assert self.vbc.verify_user_object(
             commitment_receipt["user"],
-            commitment_receipt["objectHash"],
+            commitment_receipt["objectCid"],
             commitment_receipt["timestamp"],
         )
 
@@ -81,9 +76,9 @@ class TestCommitS3Objects(unittest.TestCase):
         )
         _LOG.info(f"Testing args:\n{pprint.pformat(vars(args))}")
         commitment_receipt = commit_s3_objects(args, self.env_vars)[0]
-        assert self.c2.verify_user_object(
+        assert self.vbc.verify_user_object(
             commitment_receipt["user"],
-            commitment_receipt["objectHash"],
+            commitment_receipt["objectCid"],
             commitment_receipt["timestamp"],
         )
 
@@ -104,9 +99,9 @@ class TestCommitS3Objects(unittest.TestCase):
         _LOG.info(f"Testing args:\n{pprint.pformat(vars(args))}")
         commitment_receipts = commit_s3_objects(args, self.env_vars)
         for commitment_receipt in commitment_receipts:
-            assert self.c2.verify_user_object(
+            assert self.vbc.verify_user_object(
                 commitment_receipt["user"],
-                commitment_receipt["objectHash"],
+                commitment_receipt["objectCid"],
                 commitment_receipt["timestamp"],
             )
 
@@ -127,9 +122,9 @@ class TestCommitS3Objects(unittest.TestCase):
         _LOG.info(f"Testing args:\n{pprint.pformat(vars(args))}")
         commitment_receipts = commit_s3_objects(args, self.env_vars)
         for commitment_receipt in commitment_receipts:
-            assert self.c2.verify_user_object(
+            assert self.vbc.verify_user_object(
                 commitment_receipt["user"],
-                commitment_receipt["objectHash"],
+                commitment_receipt["objectCid"],
                 commitment_receipt["timestamp"],
             )
 
@@ -151,9 +146,9 @@ class TestCommitS3Objects(unittest.TestCase):
         _LOG.info(f"Testing args:\n{pprint.pformat(vars(args))}")
         commitment_receipts = commit_s3_objects(args, self.env_vars)
         for commitment_receipt in commitment_receipts:
-            assert self.c2.verify_user_object(
+            assert self.vbc.verify_user_object(
                 commitment_receipt["user"],
-                commitment_receipt["objectHash"],
+                commitment_receipt["objectCid"],
                 commitment_receipt["timestamp"],
             )
 

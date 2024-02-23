@@ -1,38 +1,38 @@
 # Setup
 
-## Install the c2-py library
+## Install the vbase-py library
 
-- Clone the `c2-py` repository `https://github.com/pit-labs/c2-py.git`.
-  - `c2-py` is the Python library for interacting with the validityBase (vBase) environment. 
+- Clone the `vbase-py` repository `https://github.com/validityBase/vbase-py.git`.
+  - `vbase-py` is the Python library for interacting with the validityBase (vBase) environment. 
   It is required by most command-line tools and data science workflows.
   - At the time of this limited release, the repository is private. 
   It can be cloned using GitHub Desktop or another authenticated solution.
-  - This guide assumes the repository has been cloned to the local path `~/c2/c2-py`.
+  - This guide assumes the repository has been cloned to the local path `~/validityBase/vbase-py`.
 - Install the `c2py` Python package from the cloned repository:
 ```commandline
-pip install ~/c2/c2-py
+pip install ~/validityBase/vbase-py
 ```
 
-## Install c2-py-tools
+## Install vbase-py-tools
 
-- Clone the `c2-py-tools` repository `https://github.com/pit-labs/c2-py-tools.git`.
-  - `c2-py-tools` is a set of common Python APIs and command-line wrappers for high-level
+- Clone the `vbase-py-tools` repository `https://github.com/validityBase/vbase-py-tools.git`.
+  - `vbase-py-tools` is a set of common Python APIs and command-line wrappers for high-level
   data science operations.
   - At the time of this limited release, the repository is private. 
   It can be cloned using GitHub Desktop or another authenticated solution.
-  - This guide assumes the repository has been cloned to the local path `~/c2/c2-py-tools`.
+  - This guide assumes the repository has been cloned to the local path `~/validityBase/vbase-py-tools`.
 - Install requirements:
 ```commandline
 pip3 install -r requirements.txt
 ```
-- Command-line tools can be run from the `~/c2/c2-py-tools` working directory.
+- Command-line tools can be run from the `~/validityBase/vbase-py-tools` working directory.
 - Test vBase connectivity and basic functionality:
 ```commandline
-cd ~/c2/c2-py-tools
+cd ~/validityBase/vbase-py-tools
 python3 -m c2tools.tests.test_c2_basics
 ```
 
-## Configure c2-py-tools
+## Configure vbase-py-tools
 
 vBase tools can be configured using an automatic configuration script or manually.
 We recommend an automatic configuration for the initial setup.
@@ -43,7 +43,7 @@ Run the following script to automatically configure settings stored in the .env 
 The script will ask a few questions and initialize the appropriate environment variables.
 
 ```commandline
-cd ~/c2/c2-py-tools
+cd ~/validityBase/vbase-py-tools
 python3 -m c2tools.tools.config_env
 ```
 
@@ -68,7 +68,7 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)
 
 ### Manually configure .env
 
-- Configure the environment variables for `c2-py-tools` by editing `~/c2/c2-py-tools/.env`:
+- Configure the environment variables for `vbase-py-tools` by editing `~/validityBase/vbase-py-tools/.env`:
 ```python
 # Private key for accessing vBase services:
 PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
@@ -85,10 +85,10 @@ AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
   The private key secures your access to vBase.
   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` must be defined for AWS operations such as S3 object commitment and validation.
 
-## Run c2-py-tools
+## Run vbase-py-tools
 
 vBase Python tools are now installed and configured. You can run them from the command line:
 ```commandline
-cd ~/c2/c2-py-tools
+cd ~/validityBase/vbase-py-tools
 python3 -m c2tools.tools.commit_s3_objects --h
 ```

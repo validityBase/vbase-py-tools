@@ -11,14 +11,15 @@ from typing import Dict, List, Optional
 from dotenv import dotenv_values
 import pandas as pd
 
-from tools import (
+from vbase import (
     get_default_logger,
-    C2StringSeries,
-    Web3HTTPTestIndexingService,
+    VBaseClient,
+    VBaseDataset,
+    VBaseStringObject,
+    Web3HTTPIndexingService,
 )
 
 from tools.utils import (
-    get_c2_handle,
     get_s3_handle,
     get_all_matching_objects,
     read_s3_object,
@@ -92,7 +93,7 @@ In this case, .env must define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY varia
     )
 
     # Add usage examples to the help message
-    # TODO: Add examples once the tools is finished.
+    # TODO: Add examples once the tool matures.
     parser.epilog = """
 examples:
 """
@@ -120,13 +121,15 @@ def verify_s3_objects(
         _LOG.setLevel(logging.DEBUG)
 
     # Verify the key settings.
-    provided_count = sum(
-        [
-            args.key_prefix is not None,
-            args.key_pattern is not None,
-        ]
-    )
-    if provided_count != 1:
+    if (
+        sum(
+            [
+                args.key_prefix is not None,
+                args.key_pattern is not None,
+            ]
+        )
+        != 1
+    ):
         _LOG.error(
             "Exactly one of the arguments --key_prefix or --key_pattern must be provided."
         )
@@ -134,12 +137,12 @@ def verify_s3_objects(
     # Static configuration such as S3 credentials and vBase access parameters
     # are stored in the .env file.
     s3 = get_s3_handle(args.use_aws_access_key, env_vars)
-    c2 = get_c2_handle(args.test, env_vars)
+    vbc = VBaseClient.create_instance_from_env(".env")
 
-    set_hash = C2StringSeries.get_set_hash_for_dataset(args.dataset_name)
+    set_cid = VBaseDataset.get_set_cid_for_dataset(args.dataset_name)
 
     # Verify the dataset.
-    user_address = c2.get_default_user()
+    user_address = vbc.get_default_user()
     assert user_address is not None
 
     # Record verification failure messages into a log to return to the caller.
@@ -147,10 +150,13 @@ def verify_s3_objects(
     validation_log = []
 
     # Check if the dataset commitment exists.
-    if not c2.user_set_exists(user_address, set_hash):
-        validation_log.append(
-            f"Dataset commitment does not exist: user = {user_address}, "
-            f"dataset_name = {args.dataset_name}, dataset_hash = {set_hash}"
+    if not vbc.user_set_exists(user_address, set_cid):
+        _LOG.debug(
+            "Dataset commitment does not exist: user = %s, "
+            "dataset_name = %s, set_cid = %s",
+            user_address,
+            args.dataset_name,
+            set_cid,
         )
         return status, validation_log
 
@@ -178,16 +184,19 @@ def verify_s3_objects(
     ts = []
     for obj in objs:
         data = read_s3_object(s3=s3, bucket=args.bucket, key=obj["Key"])
-        hashes.append(
-            C2StringSeries.get_object_hash_for_dataset_record(args.dataset_name, data)
-        )
+        hashes.append(VBaseStringObject.get_cid_for_data(data))
         ts.append(pd.Timestamp(obj["LastModified"]))
 
     # Query all commitments and sort by time.
-    indexing_service = Web3HTTPTestIndexingService(c2.commitment_service)
-    commitment_receipts = indexing_service.get_user_set_objects(
-        user=c2.get_default_user(),
-        set_hash=c2.get_named_set_hash(args.dataset_name),
+    # TODO: Add support for forwarder indexing service.
+    # Currently, the tool requires a direct Web3 node connection to query for events.
+    commitment_receipts = (
+        Web3HTTPIndexingService.create_instance_from_env_json_descriptor(
+            ".env"
+        ).find_user_set_objects(
+            user=vbc.get_default_user(),
+            set_cid=VBaseDataset.get_set_cid_for_dataset(args.dataset_name),
+        )
     )
 
     # Objects and commitments should match 1-1.
@@ -200,10 +209,10 @@ def verify_s3_objects(
     for i, obj in enumerate(objs):
         _LOG.debug("Validating: key = %s", obj["Key"])
         # Verify that there is a commitment with object data that follows the object timestamp.
-        if commitment_receipts[i]["objectHash"] != hashes[i]:
+        if commitment_receipts[i]["objectCid"] != hashes[i]:
             validation_log.append(
                 f"Mismatched entry: index = {i}, S3 object hash = {hashes[i]}, "
-                f'commitment object hash = {commitment_receipts[i]["objectHash"]}'
+                f'commitment object hash = {commitment_receipts[i]["objectCid"]}'
             )
         if pd.Timestamp(commitment_receipts[i]["timestamp"]) - ts[i] < pd.Timedelta(
             "0 days"

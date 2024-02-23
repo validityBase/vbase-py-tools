@@ -2,31 +2,42 @@
 Tests basic validityBase (vBase) connectivity.
 """
 
-from dotenv import dotenv_values
 import unittest
 
-vBaseimport Web3HTTPCommitmentService
-
-from tools.utils import check_env_var
+from vbase import (
+    VBaseClient,
+    Web3HTTPCommitmentService,
+    Web3HTTPCommitmentServiceTest,
+    ForwarderCommitmentService,
+    ForwarderCommitmentServiceTest,
+)
 
 
 class TestVBaseBasics(unittest.TestCase):
     def test_package_installed(self):
         try:
-            import c2
+            import vbase
         except ImportError:
-            self.fail("Package 'c2' is not installed correctly.")
+            self.fail("Package 'vbase' is not installed correctly.")
 
     def test_commitment_service_connection(self):
-        env_vars = dotenv_values(".env")
-        check_env_var(env_vars, "ENDPOINT_URL")
-        check_env_var(env_vars, "C2C_ADDRESS")
-        check_env_var(env_vars, "PRIVATE_KEY")
-        check_env_var(env_vars, "INJECT_GETH_POA_MIDDLEWARE")
-        commitment_service = Web3HTTPCommitmentService(
-            **Web3HTTPCommitmentService.get_dotenv_init_args()
-        )
-        assert commitment_service.w3.is_connected()
+        # Connect to the service using the local environment variables
+        # and verify the connection.
+        vbc = VBaseClient.create_instance_from_env(".env")
+        # Verify connectivity appropriately for various service types.
+        if isinstance(vbc.commitment_service, Web3HTTPCommitmentService) or isinstance(
+            vbc.commitment_service, Web3HTTPCommitmentServiceTest
+        ):
+            assert vbc.commitment_service.w3.is_connected()
+        else:
+            assert isinstance(
+                vbc.commitment_service, ForwarderCommitmentService
+            ) or isinstance(vbc.commitment_service, ForwarderCommitmentServiceTest)
+            # We can verify the connection by getting signature data for the current user.
+            signature_data = vbc.commitment_service._call_forwarder_api(
+                "signature-data"
+            )
+            assert len(signature_data) > 0
 
 
 if __name__ == "__main__":

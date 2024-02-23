@@ -8,7 +8,7 @@ dependencies:
 
   # Required dependencies
   - boto3
-  - c2==0.0.1
+  - vbase==0.0.1
   - python-dotenv
 
   # Optional dependencies

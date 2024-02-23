@@ -18,7 +18,7 @@ setup(
     description="Python tools for the validityBase (vBase) platform",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pit-labs/c2-py-tools",
+    url="https://github.com/validityBase/vbase-py-tools",
     packages=find_packages(),
     package_data={
         "": ["../requirements.txt", ".env", "tests/*.py"],
