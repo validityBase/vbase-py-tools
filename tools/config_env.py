@@ -5,8 +5,24 @@ Asks user a series of questions to prepare the .env configuration file.
 
 import os
 import secrets
-import sys
 from eth_account import Account
+
+
+DEFAULT_ENV_CONTENTS = """
+# Forwarder Configuration
+# URL of the production vBase forwarder service.
+# Users should not change this value.
+FORWARDER_ENDPOINT_URL="https://api.vbase.com/forwarder/"
+# User API key for accessing the vBase forwarder service.
+# Users should set this value to the API key they received from vBase.
+FORWARDER_API_KEY="USER_VBASE_API_KEY"
+
+# User Private Key
+# The private key for making stamps/commitments.
+# This key signs and controls all operations -- it must be kept secret.
+# vBase will never request this value.
+PRIVATE_KEY="USER_PRIVATE_KEY"
+"""
 
 
 def ask_yes_no_question(question: str, default: str) -> bool:
@@ -57,12 +73,24 @@ def main():
     file_path = ".env"
     # Check that the file to be configured exists.
     if not os.path.exists(file_path):
-        print(".env file not found.")
-        sys.exit(1)
+        with open(".env", "w") as file:
+            file.write(DEFAULT_ENV_CONTENTS.strip())
+        print("\nCreated a default .env file.")
 
     # Read the content of the .env file.
     with open(file_path, encoding="utf-8") as file:
         lines = file.readlines()
+
+    if ask_yes_no_question(
+        "\nDo you want to configure the vBase API key?\n",
+        "yes",
+    ):
+        vbase_api_key = ask_string_question(
+            "Please enter the vBase API key"
+        )
+        for i, line in enumerate(lines):
+            if "FORWARDER_API_KEY" in line:
+                lines[i] = f'FORWARDER_API_KEY = "{vbase_api_key}"\n'
 
     if ask_yes_no_question("\nDo you want to generate a new private key?", "yes"):
         private_key = "0x" + secrets.token_hex(32)
@@ -72,8 +100,7 @@ def main():
         # pylint: disable=E1120
         account = Account.from_key(private_key=private_key)
         # Update .env with the new private key and account.
-        print(f"\nGenerated key for a new account: {account.address}")
-        print("Please share this account with PIT Labs.")
+        print(f"\nGenerated private key for a new account: {account.address}")
         # Find the line containing the PRIVATE_KEY and update it
         for i, line in enumerate(lines):
             if "PRIVATE_KEY" in line:
