@@ -18,7 +18,7 @@ Install requirements:
 ```commandline
 pip3 install -r requirements.txt
 ```
-Command-line tools can be run from the `~/validityBase/vbase-py-tools` working directory.
+Command-line tools can now be run from the `~/validityBase/vbase-py-tools` working directory.
 
 ## Configure vbase-py-tools
 
