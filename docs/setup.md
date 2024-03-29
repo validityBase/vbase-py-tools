@@ -31,7 +31,6 @@ Run the following script to automatically configure settings stored in the .env 
 The script will ask a few questions and initialize the appropriate environment variables.
 
 ```commandline
-cd ~/validityBase/vbase-py-tools
 python3 -m tools.config_env
 ```
 
@@ -97,7 +96,6 @@ AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
 ## Test Configuration
 Test vBase connectivity and basic functionality:
 ```commandline
-cd ~/validityBase/vbase-py-tools
 python3 -m tests.test_vbase_basics
 ```
 
@@ -105,6 +103,5 @@ python3 -m tests.test_vbase_basics
 
 vBase Python tools are now installed and configured. You can run them from the command line:
 ```commandline
-cd ~/validityBase/vbase-py-tools
 python3 -m tools.commit_s3_objects --h
 ```
