@@ -28,15 +28,18 @@ The following steps guide you through this process of setting up vBase Python To
     git clone https://github.com/validityBase/vbase-py-tools.git
     ```
 
-5. **Install requirements:**
+5. **vBase Python Tools are installed!**
+    Command-line tools can now be run from the `~/validityBase/vbase-py-tools` working directory.
+    Enter the directory:
+    ```bash
+    cd vbase-py-tools
+    ```
+
+6. **Install requirements:**
     Install package requirements:
     ```bash
     pip3 install -r requirements.txt
     ```
-
-6. **vBase Python Tools are installed!**
-    Command-line tools can now be run from the `~/validityBase/vbase-py-tools` working directory.
-
 
 7. **Configure vbase-py-tools:**
     vBase tools can be configured using an automatic configuration script or manually. We recommend an automatic configuration for the initial setup.
