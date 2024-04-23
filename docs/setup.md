@@ -85,7 +85,7 @@ The following steps guide you through this process of setting up vBase Python To
     # Forwarder Configuration
     # URL of the production vBase forwarder service.
     # Users should not change this value.
-    VBASE_FORWARDER_URL="https://api.vbase.com/forwarder/"
+    VBASE_FORWARDER_URL = "https://api.vbase.com/forwarder/"
     # User API key for accessing the vBase forwarder service.
     # Users should set this value to the API key they received from vBase.
     VBASE_API_KEY = "YOUR_VBASE_API_KEY"
@@ -101,8 +101,8 @@ The following steps guide you through this process of setting up vBase Python To
     AWS_SECRET_ACCESS_KEY = "YOUR_AWS_SECRET_ACCESS_KEY"
     ```
     Below are additional details on the environment variables:
-    - `FORWARDER_API_KEY` is the private API key for accessing the vBase API service.
-    - `PRIVATE_KEY` is the (private) cryptographic key suitable for signing Ethereum transactions.
+    - `VBASE_API_KEY` is the private API key for accessing the vBase API service.
+    - `VBASE_COMMITMENT_SERVICE_PRIVATE_KEY` is the (private) cryptographic key suitable for signing Ethereum transactions.
     It can be generated using any of the mature key generation tools (https://ethereum.org/en/developers/docs/accounts/#account-creation, https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key). 
     Please keep the key private and do not disclose it to PitLabs or anyone else.
     Only the public address associated with the key is required for validation.
