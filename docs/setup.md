@@ -30,7 +30,7 @@ The following steps guide you through this process of setting up vBase Python To
 
 5. **Install requirements:**
     Install package requirements:
-    ```commandline
+    ```bash
     pip3 install -r requirements.txt
     ```
 
@@ -42,11 +42,14 @@ The following steps guide you through this process of setting up vBase Python To
     vBase tools can be configured using an automatic configuration script or manually. We recommend an automatic configuration for the initial setup.
 
    1. **Option 1: Use the automatic configuration script:**
-        Run the following script to automatically configure settings stored in the `.env` file. The script will ask a few questions and initialize the appropriate environment variables.
-        ```commandline
+        Run the following script to configure the settings stored in the `.env` file automatically.
+        The script will ask a few questions and initialize the appropriate environment variables.
+        ```bash
         python3 -m tools.config_env
         ```
+        
         You will be asked the following questions to configure the settings:
+
         ```text
         Do you want to configure the vBase API key? (y/n) [yes]:
         ```
@@ -56,6 +59,7 @@ The following steps guide you through this process of setting up vBase Python To
         to use vBase libraries, tools, and commitment services. They provide
         simple and convenient abstractions of the underlying complexities of accessing
         blockchains and managing cryptocurrencies.
+
         ```text
         Do you want to generate a new private key? (y/n) [yes]:
         ```
