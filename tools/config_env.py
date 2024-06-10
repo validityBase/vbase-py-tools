@@ -12,16 +12,16 @@ DEFAULT_ENV_CONTENTS = """
 # Forwarder Configuration
 # URL of the production vBase forwarder service.
 # Users should not change this value.
-FORWARDER_ENDPOINT_URL="https://api.vbase.com/forwarder/"
+VBASE_FORWARDER_URL="https://api.vbase.com/forwarder/"
 # User API key for accessing the vBase forwarder service.
 # Users should set this value to the API key they received from vBase.
-FORWARDER_API_KEY="USER_VBASE_API_KEY"
+VBASE_API_KEY="USER_VBASE_API_KEY"
 
 # User Private Key
 # The private key for making stamps/commitments.
 # This key signs and controls all operations -- it must be kept secret.
 # vBase will never request this value.
-PRIVATE_KEY="USER_PRIVATE_KEY"
+VBASE_COMMITMENT_SERVICE_PRIVATE_KEY="USER_VBASE_COMMITMENT_SERVICE_PRIVATE_KEY"
 """
 
 
@@ -89,8 +89,8 @@ def main():
             "Please enter the vBase API key"
         )
         for i, line in enumerate(lines):
-            if "FORWARDER_API_KEY" in line:
-                lines[i] = f'FORWARDER_API_KEY = "{vbase_api_key}"\n'
+            if "VBASE_API_KEY" in line:
+                lines[i] = f'VBASE_API_KEY = "{vbase_api_key}"\n'
 
     if ask_yes_no_question("\nDo you want to generate a new private key?", "yes"):
         private_key = "0x" + secrets.token_hex(32)
@@ -101,10 +101,10 @@ def main():
         account = Account.from_key(private_key=private_key)
         # Update .env with the new private key and account.
         print(f"\nGenerated private key for a new account: {account.address}")
-        # Find the line containing the PRIVATE_KEY and update it
+        # Find the line containing the VBASE_COMMITMENT_SERVICE_PRIVATE_KEY and update it
         for i, line in enumerate(lines):
-            if "PRIVATE_KEY" in line:
-                lines[i] = f'PRIVATE_KEY = "{private_key}"\n'
+            if "VBASE_COMMITMENT_SERVICE_PRIVATE_KEY" in line:
+                lines[i] = f'VBASE_COMMITMENT_SERVICE_PRIVATE_KEY = "{private_key}"\n'
 
     if ask_yes_no_question(
         "\nDo you want to configure AWS access keys?\n"
