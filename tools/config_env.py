@@ -3,6 +3,7 @@ Configures vbase's .env settings.
 Asks user a series of questions to prepare the .env configuration file.
 """
 
+import getpass
 import os
 import secrets
 from eth_account import Account
@@ -44,16 +45,21 @@ def ask_yes_no_question(question: str, default: str) -> bool:
         print("Invalid input. Please enter yes/no or y/n.")
 
 
-def ask_string_question(question: str, default=None):
+def ask_string_question(question: str, default=None, secret=False):
     """
     Asks user a string question.
 
     :param question: The question to ask the user.
     :param default: The default response value.
+    :param secret: If True, hide the input.
     :returns: The user response.
     """
     while True:
-        answer = input(f"{question} [{default}]: ").strip()
+        if secret:
+            answer = getpass.getpass(f"{question} [{default}]: ").strip()
+        else:
+            answer = input(f"{question} [{default}]: ").strip()
+
         if not answer:
             if default is not None:
                 return default
@@ -73,7 +79,7 @@ def main():
     file_path = ".env"
     # Check that the file to be configured exists.
     if not os.path.exists(file_path):
-        with open(".env", "w") as file:
+        with open(".env", "w", encoding="utf-8") as file:
             file.write(DEFAULT_ENV_CONTENTS.strip())
         print("\nCreated a default .env file.")
 
@@ -83,16 +89,16 @@ def main():
 
     if ask_yes_no_question(
         "\nDo you want to configure the vBase API key?\n",
-        "yes",
+        "y",
     ):
         vbase_api_key = ask_string_question(
-            "Please enter the vBase API key"
+            "Please enter the vBase API key", secret=True
         )
         for i, line in enumerate(lines):
             if "VBASE_API_KEY" in line:
                 lines[i] = f'VBASE_API_KEY = "{vbase_api_key}"\n'
 
-    if ask_yes_no_question("\nDo you want to generate a new private key?", "yes"):
+    if ask_yes_no_question("\nDo you want to generate a new private key?", "y"):
         private_key = "0x" + secrets.token_hex(32)
         # The following line creates overactive warning
         # because of difficulties with a decorated declaration:
@@ -110,11 +116,13 @@ def main():
         "\nDo you want to configure AWS access keys?\n"
         "(These are the environment variables used to configure the AWS CLI\n"
         "https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)\n",
-        "no",
+        "n",
     ):
-        aws_access_key_id = ask_string_question("\nPlease enter the AWS_ACCESS_KEY_ID")
+        aws_access_key_id = ask_string_question(
+            "\nPlease enter the AWS_ACCESS_KEY_ID", secret=True
+        )
         aws_secret_access_key = ask_string_question(
-            "Please enter the AWS_SECRET_ACCESS_KEY"
+            "Please enter the AWS_SECRET_ACCESS_KEY", secret=True
         )
         for i, line in enumerate(lines):
             if "AWS_ACCESS_KEY_ID" in line:
@@ -127,6 +135,9 @@ def main():
         file.writelines(lines)
 
     print("\nThe .env file has been updated.")
+    print(
+        "\nCongratulations! You can now run vBase Python Tools and other vBase applications!"
+    )
 
 
 if __name__ == "__main__":
