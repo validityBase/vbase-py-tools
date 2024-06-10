@@ -110,7 +110,7 @@ def main():
         "\nDo you want to configure AWS access keys?\n"
         "(These are the environment variables used to configure the AWS CLI\n"
         "https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)\n",
-        "yes",
+        "no",
     ):
         aws_access_key_id = ask_string_question("\nPlease enter the AWS_ACCESS_KEY_ID")
         aws_secret_access_key = ask_string_question(
