@@ -14,15 +14,10 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE.txt](LI
 
 This package provides a collection of Python tools for the vBase Python SDK.
 
-vBase APIs and services support provably sound data science and regulatory compliance.
-Producers can create auditable provenance records for their digital objects while retaining control and privacy.
-Consumers of data and models can perform calculations on externally-managed data
-with the same confidence and assurances as with internal enterprise data.
+vBase creates a global auditable record of when data was created, by whom, and how it has changed (collectively, “data provenance”). Data producers can prove the provenance of their data to any external party, increasing its value and marketability. Data consumers can ensure the integrity of historical data and any derivative calculations. The result is trustworthy information that can be put into production quickly without expensive and time-consuming trials.
 
-Below are some applications:
-- A stock picker can maintain an index of stock picks to prove live track record.
-- A credit analyst can maintain a model of default risk to prove its out-of-sample performance accuracy.
-- A weather data service can prove that data and models it has published in the past 
-were more accurate at forecasting than a given benchmark. 
+vBase services do not require access to the data itself, assuring privacy. They also do not rely on centralized intermediaries, eliminating the technical, operating, and business risks of a trusted party controlling your data and its validation. vBase ensures data security and interoperability that is unattainable with legacy centralized systems. It does so by storing digital fingerprints of data, metadata, and revisions on secure public blockchains.
 
-Verifiable calculations need not reveal the underlying models and data.
+## Getting Started
+
+Please follow the [Setup](docs/setup.md) guide to configure your environment.
