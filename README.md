@@ -18,6 +18,8 @@ vBase creates a global auditable record of when data was created, by whom, and h
 
 vBase services do not require access to the data itself, assuring privacy. They also do not rely on centralized intermediaries, eliminating the technical, operating, and business risks of a trusted party controlling your data and its validation. vBase ensures data security and interoperability that is unattainable with legacy centralized systems. It does so by storing digital fingerprints of data, metadata, and revisions on secure public blockchains.
 
+![Demo](https://github.com/validityBase/vbase-py-tools/assets/153264511/d5447b1b-79ad-48c5-89a6-828b31828b2b)
+
 ## Getting Started
 
 Please follow the [Setup](docs/setup.md) guide to configure your environment.
