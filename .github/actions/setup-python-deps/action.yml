@@ -1,0 +1,80 @@
+name: Setup Python dependencies
+description: Install Python dependencies from one or more requirements files with pip caching.
+# cspell:ignore pipefail
+
+inputs:
+  requirements-files:
+    description: Space-separated requirements files to install in order.
+    required: true
+  python-version:
+    description: Python version used to namespace the dependency cache.
+    required: false
+    default: "3.11"
+
+runs:
+  using: composite
+  steps:
+    - name: Validate inputs
+      shell: bash
+      env:
+        REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "$REQUIREMENTS_FILES" ]; then
+          echo "requirements-files must not be empty" >&2
+          exit 1
+        fi
+
+        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+
+        if [ "${#requirements_files[@]}" -eq 0 ]; then
+          echo "requirements-files must include at least one file" >&2
+          exit 1
+        fi
+
+    - name: Set up Python
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # actions/setup-python v6.2.0
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Build pip cache key
+      id: cache-key
+      shell: bash
+      env:
+        REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
+      run: |
+        set -euo pipefail
+
+        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+
+        requirements_hash="$(
+          sha256sum -- "${requirements_files[@]}" \
+            | sha256sum \
+            | cut -d ' ' -f 1
+        )"
+
+        echo "value=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${requirements_hash}" >> "$GITHUB_OUTPUT"
+
+    - name: Cache pip packages
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # actions/cache v5.0.4
+      with:
+        path: ~/.cache/pip
+        key: ${{ steps.cache-key.outputs.value }}
+        restore-keys: |
+          ${{ runner.os }}-python-${{ inputs.python-version }}-pip-
+
+    - name: Install dependencies
+      shell: bash
+      env:
+        REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
+      run: |
+        set -euo pipefail
+
+        python -m pip install --upgrade pip
+
+        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+
+        for requirements_file in "${requirements_files[@]}"; do
+          python -m pip install -r "$requirements_file"
+        done
