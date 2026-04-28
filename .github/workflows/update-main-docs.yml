@@ -15,7 +15,7 @@ jobs:
         # v5
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
-      - name: Install dependencies
+      - name: Set up Python and install dependencies
         uses: ./.github/actions/setup-python-deps
         with:
           requirements-files: "docs/requirements.txt requirements.txt"

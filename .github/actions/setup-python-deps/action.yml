@@ -10,6 +10,10 @@ inputs:
     description: Python version used to namespace the dependency cache.
     required: false
     default: "3.11"
+  pip-version:
+    description: Exact pip version to install before requirements. Leave empty to use setup-python's default pip.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -30,6 +34,18 @@ runs:
 
         if [ "${#requirements_files[@]}" -eq 0 ]; then
           echo "requirements-files must include at least one file" >&2
+          exit 1
+        fi
+
+        invalid_requirements_files=()
+        for requirements_file in "${requirements_files[@]}"; do
+          if [ ! -f "$requirements_file" ] || [ ! -r "$requirements_file" ]; then
+            invalid_requirements_files+=("$requirements_file")
+          fi
+        done
+
+        if [ "${#invalid_requirements_files[@]}" -ne 0 ]; then
+          printf 'requirements-files contains missing or unreadable file(s): %s\n' "${invalid_requirements_files[*]}" >&2
           exit 1
         fi
 
@@ -74,10 +90,13 @@ runs:
       shell: bash
       env:
         REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
+        PIP_VERSION: ${{ inputs.pip-version }}
       run: |
         set -euo pipefail
 
-        python -m pip install --upgrade pip
+        if [ -n "$PIP_VERSION" ]; then
+          python -m pip install "pip==$PIP_VERSION"
+        fi
 
         read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
 
