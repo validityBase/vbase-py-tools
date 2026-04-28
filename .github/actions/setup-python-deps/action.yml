@@ -49,17 +49,23 @@ runs:
         read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
 
         requirements_hash="$(
-          sha256sum -- "${requirements_files[@]}" \
-            | sha256sum \
-            | cut -d ' ' -f 1
+          python -c 'import hashlib, pathlib, sys; combined_hash = hashlib.sha256(); [combined_hash.update(f"{hashlib.sha256(pathlib.Path(requirements_file).read_bytes()).hexdigest()}  {requirements_file}\n".encode("utf-8")) for requirements_file in sys.argv[1:]]; print(combined_hash.hexdigest())' "${requirements_files[@]}"
         )"
 
         echo "value=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${requirements_hash}" >> "$GITHUB_OUTPUT"
 
+    - name: Locate pip cache
+      id: pip-cache
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "dir=$(python -m pip cache dir)" >> "$GITHUB_OUTPUT"
+
     - name: Cache pip packages
       uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # actions/cache v5.0.4
       with:
-        path: ~/.cache/pip
+        path: ${{ steps.pip-cache.outputs.dir }}
         key: ${{ steps.cache-key.outputs.value }}
         restore-keys: |
           ${{ runner.os }}-python-${{ inputs.python-version }}-pip-
