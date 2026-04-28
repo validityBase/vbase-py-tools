@@ -59,16 +59,19 @@ runs:
       shell: bash
       env:
         REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
+        PIP_VERSION: ${{ inputs.pip-version }}
       run: |
         set -euo pipefail
 
         read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+        pip_cache_version="${PIP_VERSION:-default}"
 
         requirements_hash="$(
           python -c 'import hashlib, pathlib, sys; combined_hash = hashlib.sha256(); [combined_hash.update(f"{hashlib.sha256(pathlib.Path(requirements_file).read_bytes()).hexdigest()}  {requirements_file}\n".encode("utf-8")) for requirements_file in sys.argv[1:]]; print(combined_hash.hexdigest())' "${requirements_files[@]}"
         )"
 
-        echo "value=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${requirements_hash}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${pip_cache_version}-${requirements_hash}" >> "$GITHUB_OUTPUT"
+        echo "restore-prefix=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${pip_cache_version}-" >> "$GITHUB_OUTPUT"
 
     - name: Locate pip cache
       id: pip-cache
@@ -84,7 +87,7 @@ runs:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: ${{ steps.cache-key.outputs.value }}
         restore-keys: |
-          ${{ runner.os }}-python-${{ inputs.python-version }}-pip-
+          ${{ steps.cache-key.outputs.restore-prefix }}
 
     - name: Install dependencies
       shell: bash
