@@ -18,7 +18,9 @@ jobs:
       - name: Set up Python and install dependencies
         uses: ./.github/actions/setup-python-deps
         with:
-          requirements-files: "docs/requirements.txt requirements.txt"
+          requirements-files: |
+            docs/requirements.txt
+            requirements.txt
           python-version: "3.11"
 
       - name: Build Sphinx Markdown docs

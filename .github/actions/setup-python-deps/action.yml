@@ -4,16 +4,12 @@ description: Install Python dependencies from one or more requirements files wit
 
 inputs:
   requirements-files:
-    description: Space-separated requirements files to install in order.
+    description: Newline-separated requirements files to install in order.
     required: true
   python-version:
-    description: Python version used to namespace the dependency cache.
+    description: Python version to set up.
     required: false
     default: "3.11"
-  pip-version:
-    description: Exact pip version to install before requirements. Leave empty to use setup-python's default pip.
-    required: false
-    default: ""
 
 runs:
   using: composite
@@ -30,7 +26,7 @@ runs:
           exit 1
         fi
 
-        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+        IFS=$' \t\r\n' read -r -d '' -a requirements_files < <(printf '%s\0' "$REQUIREMENTS_FILES")
 
         if [ "${#requirements_files[@]}" -eq 0 ]; then
           echo "requirements-files must include at least one file" >&2
@@ -53,55 +49,17 @@ runs:
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # actions/setup-python v6.2.0
       with:
         python-version: ${{ inputs.python-version }}
-
-    - name: Build pip cache key
-      id: cache-key
-      shell: bash
-      env:
-        REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
-        PIP_VERSION: ${{ inputs.pip-version }}
-      run: |
-        set -euo pipefail
-
-        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
-        pip_cache_version="${PIP_VERSION:-default}"
-
-        requirements_hash="$(
-          python -c 'import hashlib, pathlib, sys; combined_hash = hashlib.sha256(); [combined_hash.update(f"{hashlib.sha256(pathlib.Path(requirements_file).read_bytes()).hexdigest()}  {requirements_file}\n".encode("utf-8")) for requirements_file in sys.argv[1:]]; print(combined_hash.hexdigest())' "${requirements_files[@]}"
-        )"
-
-        echo "value=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${pip_cache_version}-${requirements_hash}" >> "$GITHUB_OUTPUT"
-        echo "restore-prefix=${{ runner.os }}-python-${{ inputs.python-version }}-pip-${pip_cache_version}-" >> "$GITHUB_OUTPUT"
-
-    - name: Locate pip cache
-      id: pip-cache
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        echo "dir=$(python -m pip cache dir)" >> "$GITHUB_OUTPUT"
-
-    - name: Cache pip packages
-      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # actions/cache v5.0.4
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ steps.cache-key.outputs.value }}
-        restore-keys: |
-          ${{ steps.cache-key.outputs.restore-prefix }}
+        cache: pip
+        cache-dependency-path: ${{ inputs.requirements-files }}
 
     - name: Install dependencies
       shell: bash
       env:
         REQUIREMENTS_FILES: ${{ inputs.requirements-files }}
-        PIP_VERSION: ${{ inputs.pip-version }}
       run: |
         set -euo pipefail
 
-        if [ -n "$PIP_VERSION" ]; then
-          python -m pip install "pip==$PIP_VERSION"
-        fi
-
-        read -r -a requirements_files <<< "$REQUIREMENTS_FILES"
+        IFS=$' \t\r\n' read -r -d '' -a requirements_files < <(printf '%s\0' "$REQUIREMENTS_FILES")
 
         for requirements_file in "${requirements_files[@]}"; do
           python -m pip install -r "$requirements_file"
