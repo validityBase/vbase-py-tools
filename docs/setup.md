@@ -17,7 +17,7 @@ The following steps guide you through this process of setting up vBase Python To
     ```
 
 3. **Install the vBase Python SDK:**
-    Install the `vbase` python package that provides the vBase Python SDK:
+    Install the `vbase` Python package that provides the vBase Python SDK:
     ```bash
     pip install vbase
     ```
