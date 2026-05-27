@@ -25,3 +25,26 @@ With vBase, creating and consuming provably correct data is as easy as pressing 
 ## Getting Started
 
 Please follow the [Setup](docs/setup.md) guide to configure your environment.
+
+Install dependencies from the generated hash-locked requirements files:
+
+```bash
+python -m pip install --require-hashes -r requirements.txt
+```
+
+For development tooling:
+
+```bash
+python -m pip install --require-hashes -r requirements-dev.txt
+python -m pip install --no-deps --no-build-isolation -e .
+```
+
+Dependency updates should be made in the matching `.in` file, then regenerated
+with `pip-compile --generate-hashes`. Do not edit generated `.txt` lock files by
+hand.
+
+Use the pinned lock tooling before regenerating requirements files:
+
+```bash
+python -m pip install --require-hashes -r requirements-lock.txt
+```
