@@ -27,7 +27,7 @@ setup(
     url="https://github.com/validityBase/vbase-py-tools",
     packages=find_packages(),
     package_data={
-        "": [".env", "tests/*.py"],
+        "": ["tests/*.py"],
     },
     install_requires=requirements,
     classifiers=[
