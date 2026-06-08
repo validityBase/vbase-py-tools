@@ -26,10 +26,10 @@ With vBase, creating and consuming provably correct data is as easy as pressing 
 
 Please follow the [Setup](docs/setup.md) guide to configure your environment.
 
-Install dependencies from the generated hash-locked requirements files:
+Install the package from the repository:
 
 ```bash
-python -m pip install --require-hashes -r requirements.txt
+python -m pip install -e .
 ```
 
 For development tooling:
@@ -49,10 +49,10 @@ Dependency updates should be made in the matching `.in` file, then regenerated
 with the same `pip-compile` flags used in CI:
 
 ```bash
-pip-compile --strip-extras --no-annotate --generate-hashes -o requirements.txt requirements.in
 pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-dev.txt requirements-dev.in
 pip-compile --strip-extras --no-annotate --generate-hashes -o docs/requirements.txt docs/requirements.in
 pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-lock.txt requirements-lock.in
 ```
 
-Do not edit generated `.txt` lock files by hand.
+Runtime package dependencies are range-based in `requirements.in`. Do not edit
+generated lock files by hand.

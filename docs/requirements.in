@@ -1,3 +1,6 @@
+-r ../requirements.in
+
+greenlet>=3.2.0
 myst-parser
 sphinx-argparse-cli
 sphinx-markdown-builder

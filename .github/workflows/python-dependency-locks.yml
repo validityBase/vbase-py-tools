@@ -36,7 +36,7 @@ jobs:
       - name: Verify lock tooling lock is committed
         run: git diff --exit-code -- requirements-lock.txt
 
-  root-locks:
+  development-locks:
     runs-on: ubuntu-latest
 
     steps:
@@ -51,13 +51,11 @@ jobs:
           python-version: "3.11"
           require-hashes: "true"
 
-      - name: Regenerate root dependency locks
-        run: |
-          pip-compile --strip-extras --no-annotate --generate-hashes -o requirements.txt requirements.in
-          pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-dev.txt requirements-dev.in
+      - name: Regenerate development dependency lock
+        run: pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-dev.txt requirements-dev.in
 
-      - name: Verify root dependency locks are committed
-        run: git diff --exit-code -- requirements.txt requirements-dev.txt
+      - name: Verify development dependency lock is committed
+        run: git diff --exit-code -- requirements-dev.txt
 
       - name: Install development dependencies
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1

@@ -1,7 +1,5 @@
-boto3
-pandas
-python-dotenv
-vbase==1.0.0
-# SQLAlchemy requires greenlet on Linux; keep it explicit so pip-compile output
-# is stable across local macOS regeneration and Ubuntu CI regeneration.
-greenlet>=3.2.0
+boto3>=1.36.19
+eth-account>=0.13.6
+pandas>=2.3.2
+python-dotenv>=1.0.0
+vbase>=1.0.0,<2

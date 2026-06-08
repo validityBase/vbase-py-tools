@@ -8,8 +8,9 @@ the vBase Python SDK.
 - Keep tool code small, readable, and focused on operational workflows.
 - Do not commit secrets, private keys, API tokens, `.env` files, or logs
   containing credentials.
-- Runtime dependencies are declared in `requirements.in`; generated lock files
-  are committed with hashes and must not be edited by hand.
+- Runtime package dependencies are declared as ranges in `requirements.in`.
+- Development, docs, and lock-tooling environments use generated hash locks
+  that must not be edited by hand.
 - Documentation published externally lives in `docs/`.
 - Internal specs, guides, and agent memory live in `internal/`.
 
