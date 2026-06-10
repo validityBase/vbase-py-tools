@@ -2,4 +2,4 @@ boto3
 pandas
 python-dotenv
 setuptools
-git+https://github.com/validityBase/vbase-py.git#egg=vbase
+vbase
