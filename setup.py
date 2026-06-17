@@ -2,13 +2,19 @@
 Python tools for the validityBase (vBase) platform
 """
 
+from pathlib import Path
+
 from setuptools import find_packages, setup
 
-with open("README.md") as f:
-    long_description = f.read()
+ROOT_DIR = Path(__file__).resolve().parent
 
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
+long_description = (ROOT_DIR / "README.md").read_text(encoding="utf-8")
+
+requirements = []
+for raw_line in (ROOT_DIR / "requirements.in").read_text(encoding="utf-8").splitlines():
+    line = raw_line.strip()
+    if line and not line.startswith("#"):
+        requirements.append(line)
 
 setup(
     name="c2tools",
@@ -21,12 +27,12 @@ setup(
     url="https://github.com/validityBase/vbase-py-tools",
     packages=find_packages(),
     package_data={
-        "": ["../requirements.txt", ".env", "tests/*.py"],
+        "": ["tests/*.py"],
     },
     install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )

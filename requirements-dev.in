@@ -1,0 +1,7 @@
+-r requirements.in
+
+black
+greenlet>=3.2.0
+pip-tools
+pylint
+wheel
