@@ -1,6 +1,6 @@
 -r base.in
 
-greenlet>=3.2.0
+greenlet>=3.5.4
 myst-parser
 sphinx-argparse-cli
 sphinx-markdown-builder
