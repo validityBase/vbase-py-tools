@@ -3,11 +3,9 @@ name: Python Dependency Locks
 on:
   pull_request:
     paths:
-      - "requirements*.in"
-      - "requirements*.txt"
-      - "docs/requirements*.in"
-      - "docs/requirements*.txt"
+      - "requirements/**"
       - "setup.py"
+      - "MANIFEST.in"
       - ".github/workflows/python-dependency-locks.yml"
   workflow_dispatch:
 
@@ -26,15 +24,15 @@ jobs:
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1
         with:
           requirements-files: |
-            requirements-lock.txt
+            requirements/tools.txt
           python-version: "3.11"
           require-hashes: "true"
 
       - name: Regenerate lock tooling lock
-        run: pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-lock.txt requirements-lock.in
+        run: pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/tools.txt requirements/tools.in
 
       - name: Verify lock tooling lock is committed
-        run: git diff --exit-code -- requirements-lock.txt
+        run: git diff --exit-code -- requirements/tools.txt
 
   development-locks:
     runs-on: ubuntu-latest
@@ -47,21 +45,21 @@ jobs:
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1
         with:
           requirements-files: |
-            requirements-lock.txt
+            requirements/tools.txt
           python-version: "3.11"
           require-hashes: "true"
 
       - name: Regenerate development dependency lock
-        run: pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-dev.txt requirements-dev.in
+        run: pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/dev.txt requirements/dev.in
 
       - name: Verify development dependency lock is committed
-        run: git diff --exit-code -- requirements-dev.txt
+        run: git diff --exit-code -- requirements/dev.txt
 
       - name: Install development dependencies
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1
         with:
           requirements-files: |
-            requirements-dev.txt
+            requirements/dev.txt
           python-version: "3.11"
           require-hashes: "true"
 
@@ -82,20 +80,20 @@ jobs:
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1
         with:
           requirements-files: |
-            requirements-lock.txt
+            requirements/tools.txt
           python-version: "3.11"
           require-hashes: "true"
 
       - name: Regenerate docs dependency lock
-        run: pip-compile --strip-extras --no-annotate --generate-hashes -o docs/requirements.txt docs/requirements.in
+        run: pip-compile --strip-extras --no-annotate --generate-hashes -o requirements/docs.txt requirements/docs.in
 
       - name: Verify docs dependency lock is committed
-        run: git diff --exit-code -- docs/requirements.txt
+        run: git diff --exit-code -- requirements/docs.txt
 
       - name: Install docs dependencies
         uses: validityBase/vbase-github-actions/.github/actions/setup-python-deps@v1
         with:
           requirements-files: |
-            docs/requirements.txt
+            requirements/docs.txt
           python-version: "3.11"
           require-hashes: "true"

@@ -15,8 +15,7 @@ jobs:
     with:
       python-version: "3.11"
       requirements-files: |
-        docs/requirements.txt
-      require-hashes: true
+        requirements/docs.txt
       pre-publish-command: sphinx-build -b markdown docs/ docs/_build/markdown
       source-docs-path: docs/_build/markdown
       target-repository-branch: main

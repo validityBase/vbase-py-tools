@@ -1,4 +1,4 @@
--r requirements.in
+-r base.in
 
 black
 greenlet>=3.2.0
