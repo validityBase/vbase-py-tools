@@ -35,24 +35,24 @@ python -m pip install -e .
 For development tooling:
 
 ```bash
-python -m pip install --require-hashes -r requirements-dev.txt
+python -m pip install --require-hashes -r requirements/dev.txt
 python -m pip install --no-deps --no-build-isolation -e .
 ```
 
 Use the pinned lock tooling before regenerating requirements files:
 
 ```bash
-python -m pip install --require-hashes -r requirements-lock.txt
+python -m pip install --require-hashes -r requirements/tools.txt
 ```
 
 Dependency updates should be made in the matching `.in` file, then regenerated
 with the same `pip-compile` flags used in CI:
 
 ```bash
-pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-dev.txt requirements-dev.in
-pip-compile --strip-extras --no-annotate --generate-hashes -o docs/requirements.txt docs/requirements.in
-pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements-lock.txt requirements-lock.in
+pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/dev.txt requirements/dev.in
+pip-compile --strip-extras --no-annotate --generate-hashes -o requirements/docs.txt requirements/docs.in
+pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/tools.txt requirements/tools.in
 ```
 
-Runtime package dependencies are range-based in `requirements.in`. Do not edit
-generated lock files by hand.
+Runtime package dependencies are range-based in `requirements/base.in`. Do not
+edit generated lock files by hand.

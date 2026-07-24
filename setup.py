@@ -7,14 +7,16 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 ROOT_DIR = Path(__file__).resolve().parent
+PACKAGE_REQUIREMENTS_FILE = ROOT_DIR / "requirements/base.in"
 
 long_description = (ROOT_DIR / "README.md").read_text(encoding="utf-8")
 
 requirements = []
-for raw_line in (ROOT_DIR / "requirements.in").read_text(encoding="utf-8").splitlines():
-    line = raw_line.strip()
-    if line and not line.startswith("#"):
-        requirements.append(line)
+for raw_line in PACKAGE_REQUIREMENTS_FILE.read_text(encoding="utf-8").splitlines():
+    line = raw_line.split("#", 1)[0].strip()
+    if not line or line.startswith("-"):
+        continue
+    requirements.append(line)
 
 setup(
     name="c2tools",

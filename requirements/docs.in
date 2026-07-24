@@ -1,4 +1,4 @@
--r ../requirements.in
+-r base.in
 
 greenlet>=3.2.0
 myst-parser
