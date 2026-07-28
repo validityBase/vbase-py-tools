@@ -5,9 +5,9 @@ updates:
     # requirements/*.in inputs and requirements/*.txt outputs.
     directory: "/requirements"
     schedule:
-      interval: "cron"
-      cronjob: "0 0 * * *"
-    versioning-strategy: "increase-if-necessary"
+      interval: "daily"
+      time: "00:00"
+      timezone: "Etc/UTC"
     groups:
       pip-minor-patch-updates:
         applies-to: "version-updates"
