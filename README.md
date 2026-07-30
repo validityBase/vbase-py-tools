@@ -45,14 +45,6 @@ Use the pinned lock tooling before regenerating requirements files:
 python -m pip install --require-hashes -r requirements/tools.txt
 ```
 
-Dependency updates should be made in the matching `.in` file, then regenerated
-with the same `pip-compile` flags used in CI:
-
-```bash
-pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/dev.txt requirements/dev.in
-pip-compile --strip-extras --no-annotate --generate-hashes -o requirements/docs.txt requirements/docs.in
-pip-compile --strip-extras --no-annotate --allow-unsafe --generate-hashes -o requirements/tools.txt requirements/tools.in
-```
-
-Runtime package dependencies are range-based in `requirements/base.in`. Do not
-edit generated lock files by hand.
+See `internal/specs/python-dependency-hashes.md` in this repository for the
+dependency layout, lock policy, package metadata rules, and regeneration
+commands.
