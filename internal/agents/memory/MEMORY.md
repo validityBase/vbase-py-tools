@@ -8,7 +8,7 @@
 - Docs publishing installs `requirements/docs.txt`, builds Markdown with Sphinx, and publishes to the `main` branch of the central docs repository.
 
 ## Python Dependencies
-- Runtime package dependencies are declared as ranges in `requirements/base.in`; `setup.py` reads this input file for package metadata.
-- Generated development, docs, and lock-tooling files include hashes and are installed with `python -m pip install --require-hashes -r <file>`.
-- `requirements/tools.txt` pins pip-tools for lock regeneration.
+- Dependency layout, lock policy, and package metadata rules are canonical in
+  `internal/specs/python-dependency-hashes.md`; keep that as the only detailed
+  copy.
 - The public vBase SDK dependency is installed from PyPI as a range dependency, not from the `validityBase/vbase-py` Git repository.

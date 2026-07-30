@@ -1,8 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    # Dependabot can scan the pip-compile layout when it sees both
-    # requirements/*.in inputs and requirements/*.txt outputs.
+    # Dependabot scans pip requirements in this directory.
     directory: "/requirements"
     schedule:
       interval: "daily"
