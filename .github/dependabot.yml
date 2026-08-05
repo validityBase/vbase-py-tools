@@ -1,7 +1,9 @@
+# Generated from validityBase/github-configuration templates.
+# Do not edit rendered files manually; update templates/ and config/ instead.
 version: 2
 updates:
   - package-ecosystem: "pip"
-    # Dependabot scans pip requirements in this directory.
+    # Dependabot scans pip requirement files in this directory.
     directory: "/requirements"
     schedule:
       interval: "daily"
