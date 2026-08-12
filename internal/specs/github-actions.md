@@ -29,7 +29,9 @@
 - Uses reviewed moving major tags for validityBase-owned shared workflows so
   centrally reviewed fixes roll forward without per-repository pin updates.
 - Requires `VBASE_COMMON_REPO_READ_TOKEN` and
-  `VBASE_REPO_BACKUP_SECRETS_TOKEN` GitHub Actions secrets.
+  `VBASE_REPO_BACKUP_SECRETS_TOKEN` GitHub Actions secrets;
+  `VBASE_REPO_BACKUP_SECRETS_TOKEN` is passed as `BWS_ACCESS_TOKEN` to the
+  reusable workflow.
 - Reads object storage credentials from the `vbase-repo-backups` Bitwarden
   project at runtime; bucket lifecycle and restore-test policy live outside
   this repository.
