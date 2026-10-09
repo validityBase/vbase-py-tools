@@ -23,9 +23,9 @@
 - Installs generated locks with `require-hashes: "true"` and checks package metadata with `pip check`.
 
 ### `.github/workflows/repo-backup.yml`
-- Runs daily and through manual dispatch to create a full-history git bundle
-  backup.
-- Delegates to `validityBase/vbase-github-actions/.github/workflows/repo-backup.yml@v1`.
+- Runs daily and through manual dispatch. The shared workflow creates a monthly
+  full Git bundle or a daily differential backup.
+- Delegates to `validityBase/vbase-github-actions/.github/workflows/repo-backup.yml@v2`.
 - Uses reviewed moving major tags for validityBase-owned shared workflows so
   centrally reviewed fixes roll forward without per-repository pin updates.
 - Requires `VBASE_COMMON_REPO_READ_TOKEN` and
