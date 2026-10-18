@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   lock-tooling:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -35,7 +35,7 @@ jobs:
         run: git diff --exit-code -- requirements/tools.txt
 
   development-locks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -70,7 +70,7 @@ jobs:
         run: python -m pip check
 
   docs-locks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
