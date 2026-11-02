@@ -2,4 +2,4 @@ boto3>=1.43.59
 eth-account>=0.13.6
 pandas>=3.0.5
 python-dotenv>=1.0.0
-vbase>=1.0.1,<2
+vbase>=1.0.1,<3
