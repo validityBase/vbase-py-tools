@@ -1,6 +1,6 @@
 """
 Tests of validityBase (vBase) commitments for one or more S3 objects.
-These tests use Pit Labs' AWS data by default.
+These tests use PIT Labs' AWS data by default.
 If you wish to run these tests, you will have to modify AWS parameters.
 These test rely on the vBase connection and AWS settings stored in the .env file.
 """
